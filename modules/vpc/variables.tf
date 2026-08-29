@@ -2,11 +2,11 @@ variable "env" {
   type        = string
   description = "what type of environment"
 }
-variable "vpc_cidr"{
+variable "vpc_cidr" {
   type        = string
   description = "VPC cidr"
 }
-variable "subnet_cidr"{
+variable "subnet_cidr" {
   type        = string
   description = "Subnet cidr"
 }

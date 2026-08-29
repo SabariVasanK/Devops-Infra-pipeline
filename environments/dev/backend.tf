@@ -5,15 +5,13 @@ terraform {
       version = "~> 4.0"
     }
   }
-    backend "s3" {
+  backend "s3" {
     bucket = "infra-pipelin-terrastate"
-    key    = "environment/dev/terraform.tfstate"
+    key    = "environments/dev/terraform.tfstate"
     region = "us-east-1"
   }
 }
 
-# Configure the AWS Provider
 provider "aws" {
   region = var.aws_region
-
 }
