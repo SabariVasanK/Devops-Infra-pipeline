@@ -9,14 +9,19 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git branch: "${env.BRANCH_NAME}", url: 'https://github.com/SabariVasanK/Devops-Infra-pipeline.git'
+        git branch: "${env.BRANCH_NAME}", url: 'https://github.com/SabariVasanK/Devops-Infra-pipeline.git', credentialsId: 'Github-credentials'
       }
     }
 
     stage('Terraform Init') {
       steps {
         dir("${TF_WORKDIR}") {
-          sh 'terraform init'
+          withCredentials([
+            string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+          ]) {
+            sh 'terraform init'
+          }
         }
       }
     }
@@ -24,28 +29,33 @@ pipeline {
     stage('Terraform Plan') {
       steps {
         dir("${TF_WORKDIR}") {
-          sh 'terraform plan -out=tfplan'
-          sh 'terraform show -no-color tfplan > tfplan.txt'
-          sh 'cat tfplan.txt'
+          withCredentials([
+            string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+          ]) {
+            sh 'terraform plan -out=tfplan'
+            sh 'terraform show -no-color tfplan > tfplan.txt'
+            sh 'cat tfplan.txt'
+          }
         }
       }
     }
 
     stage('Approval') {
-      /*
-      when {
-        expression { env.BRANCH_NAME == 'production' }
-      }
-      */
       steps {
-        input message: "Approvee the deployment to production?", ok: 'Deploy'
+        input message: "Approve the deployment to production?", ok: 'Deploy'
       }
     }
 
     stage('Terraform Apply') {
       steps {
         dir("${TF_WORKDIR}") {
-          sh 'terraform apply tfplan'
+          withCredentials([
+            string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+          ]) {
+            sh 'terraform apply tfplan'
+          }
         }
       }
     }
