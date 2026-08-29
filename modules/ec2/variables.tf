@@ -3,7 +3,7 @@ variable "ami_id" {
 
   description = "Ami Id of EC2"
 }
-variable "ec2-type" {
+variable "ec2_type" {
   type        = string
   default     = ""
   description = "Instance type of ec2"
